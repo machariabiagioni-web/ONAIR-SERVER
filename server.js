@@ -3,15 +3,22 @@ const io = require("socket.io")(process.env.PORT || 3000, {
 });
 
 io.on("connection", (socket) => {
+  console.log("Utente connesso:", socket.id);
+
   socket.on("join-channel", (channel) => {
     socket.join(channel);
-    console.log(`Utente entrato nel canale: ${channel}`);
+    console.log(`Socket ${socket.id} unito al canale ${channel}`);
   });
 
-  // Riceve il pezzetto di audio e lo spara a tutti gli altri nel canale
-  socket.on("audio-data", (data) => {
-    socket.to(data.channel).emit("audio-stream", data.blob);
+  // Smista i segnali WebRTC (Offerte, Risposte, Candidati ICE)
+  socket.on("signal", (data) => {
+    // Invia il segnale a tutti gli altri telefoni nello stesso canale
+    socket.to(data.channel).emit("signal", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Utente disconnesso");
   });
 });
 
-console.log("Server ONAIR pronto sulla sedia!");
+console.log("Server di segnalazione VoIP avviato correttamente!");
