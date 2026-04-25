@@ -9,8 +9,10 @@ io.on("connection", (socket) => {
     socket.join(channel);
   });
 
-  // Il server riceve il pacchetto e lo rimanda subito a tutti gli altri
   socket.on("audio-data", (data) => {
+    // Invia i dati binari puri a tutti gli altri nel canale
     socket.to(data.channel).emit("audio-stream", data.blob);
   });
 });
+
+console.log("Server Relay Wi-Fi pronto!");
