@@ -3,14 +3,14 @@ const io = require("socket.io")(process.env.PORT || 3000, {
 });
 
 io.on("connection", (socket) => {
+  console.log("Utente connesso:", socket.id);
+
   socket.on("join-channel", (channel) => {
     socket.join(channel);
   });
 
-  // Riceve l'audio da uno e lo spara a tutti gli altri nel canale
+  // Il server riceve il pacchetto e lo rimanda subito a tutti gli altri
   socket.on("audio-data", (data) => {
     socket.to(data.channel).emit("audio-stream", data.blob);
   });
 });
-
-console.log("Server Relay 4G Pronto!");
