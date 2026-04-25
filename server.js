@@ -3,16 +3,19 @@ const io = require("socket.io")(process.env.PORT || 3000, {
 });
 
 io.on("connection", (socket) => {
-  console.log("Utente connesso:", socket.id);
+  console.log("Nuovo utente connesso:", socket.id);
 
+  // Quando un utente entra in un canale
   socket.on("join-channel", (channel) => {
     socket.join(channel);
-    console.log(`Socket ${socket.id} unito al canale ${channel}`);
+    console.log(`Utente ${socket.id} unito al canale: ${channel}`);
   });
 
-  // Smista i segnali WebRTC (Offerte, Risposte, Candidati ICE)
+  // FONDAMENTALE PER IL VOIP:
+  // Questo smista i segnali WebRTC (offerte, risposte e candidati ICE)
+  // Senza questo, i server Metered non sanno dove mandare l'audio.
   socket.on("signal", (data) => {
-    // Invia il segnale a tutti gli altri telefoni nello stesso canale
+    // Invia il segnale a tutti gli ALTRI nel canale, tranne a chi lo ha inviato
     socket.to(data.channel).emit("signal", data);
   });
 
@@ -21,4 +24,4 @@ io.on("connection", (socket) => {
   });
 });
 
-console.log("Server di segnalazione VoIP avviato correttamente!");
+console.log("Server di segnalazione VoIP pronto su Render!");
